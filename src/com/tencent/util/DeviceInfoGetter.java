@@ -1,0 +1,96 @@
+package com.tencent.util;
+
+import java.util.Locale;
+
+import android.content.Context;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.os.Build;
+import android.telephony.TelephonyManager;
+
+/**
+ * 设备信息类
+ * 
+ * @author admin
+ * 
+ */
+public final class DeviceInfoGetter {
+	private static DeviceInfoGetter _instance = null;
+	// 设备信息
+	private DeviceInfo info;
+
+	private TelephonyManager telephonyManager = null;
+	private WifiManager wifiManager = null;
+
+	private static Context mContext;
+	
+	private DeviceInfoGetter(Context context) {
+		mContext=context;
+		
+		//获取设备信息
+		if (telephonyManager == null)
+			telephonyManager = (TelephonyManager) mContext
+					.getSystemService(Context.TELEPHONY_SERVICE);
+		if (wifiManager == null)
+			wifiManager = (WifiManager) mContext
+					.getSystemService(Context.WIFI_SERVICE);
+		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+
+		String mAC = wifiInfo.getMacAddress();
+		String iMEI = telephonyManager.getDeviceId();
+		String iMSI = telephonyManager.getSubscriberId();
+		String phoneModel=Build.MODEL.replaceAll(" ", "_"); //替换所有空格，因为空格在HTTP中是不允许的
+		String phoneNumber = telephonyManager.getLine1Number();
+		String language=Locale.getDefault().getLanguage();
+		int netwrokType = telephonyManager.getNetworkType();
+		String providersName = getProvidersName(iMSI);
+		String sDKVersion = Build.VERSION.SDK;
+		String sDKReleaseVersion = Build.VERSION.RELEASE;
+
+		
+		if (info == null) {
+			info = new DeviceInfo();
+			info.setDeviceInfo(mAC, iMEI, iMSI,phoneModel, phoneNumber,language, netwrokType,
+					providersName, sDKVersion, sDKReleaseVersion);
+		}
+	}
+
+	/**
+	 * 返回DevieInfo实例
+	 * 
+	 * @return
+	 */
+	public static synchronized DeviceInfoGetter getInstance(Context mContext) {
+		if (_instance == null) {
+			_instance = new DeviceInfoGetter(mContext);
+		}
+		return _instance;
+	}
+
+	private String getProvidersName(String IMSI) {
+		String providersName = null;
+		IMSI = telephonyManager.getSubscriberId();
+		if (IMSI != null) {
+			// IMSI号前面3位460是国家，紧接着后面2位00 02是中国移动，01是中国联通，03是中国电信。
+			if (IMSI.startsWith("46000") || IMSI.startsWith("46002")) {
+				providersName = "中国移动";
+			} else if (IMSI.startsWith("46001")) {
+				providersName = "中国联通";
+			} else if (IMSI.startsWith("46003")) {
+				providersName = "中国电信";
+			} else {
+				providersName = "未知";
+			}
+		}
+		return providersName;
+	}
+
+	/**
+	 * 获取设备信息
+	 * 
+	 * @return
+	 */
+	public DeviceInfo getDeviceInfo() {
+		return info;
+	}
+}

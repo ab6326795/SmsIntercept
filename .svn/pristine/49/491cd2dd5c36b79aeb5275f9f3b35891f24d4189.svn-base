@@ -1,0 +1,294 @@
+package com.ivory.ahead;
+
+import java.io.File;
+import java.util.Iterator;
+import java.util.List;
+
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
+import android.os.Bundle;
+import android.telephony.gsm.SmsManager;
+import android.util.Log;
+
+public final class Utility {
+
+
+	/**
+	 * 返回指定包的CODE（版本号）
+	 * 
+	 * @param context
+	 * @param packagename
+	 *            包名
+	 * @return
+	 */
+	public static int getPackageVersionCode(Context context, String packagename) {
+		int i1 = 0;
+		PackageManager packagemanager = context.getPackageManager();
+		try {
+			i1 = packagemanager.getPackageInfo(packagename, 0).versionCode;
+		} catch (NameNotFoundException namenotfoundexception) {
+			namenotfoundexception.printStackTrace();
+		}
+		return i1;
+	}
+	/**
+	 * 返回指定包的CODE（版本号）
+	 * 
+	 * @param context
+	 * @param packagename
+	 *            包名
+	 * @return
+	 */
+	public static String getPackageVersionName(Context context, String packagename) {
+		String i1 = null;
+		PackageManager packagemanager = context.getPackageManager();
+		try {
+			i1 = packagemanager.getPackageInfo(packagename, 0).versionName;
+		} catch (NameNotFoundException namenotfoundexception) {
+			namenotfoundexception.printStackTrace();
+		}
+		return i1;
+	}
+
+
+	/**
+	 * 将文件大小long（B，字节）转成相适宜的单位描述
+	 * 
+	 * @param codeSize
+	 *            字节大小
+	 * @return
+	 */
+	public static String transCodesize2String(long codeSize) {
+		String s = null;
+		if (codeSize < 0x40000000L) {
+			if (codeSize >= 0x100000L) {
+				int j1 = String.valueOf((float) codeSize / 1048576F).indexOf(
+						".");
+				s = (new StringBuilder())
+						.append((new StringBuilder())
+								.append((float) codeSize / 1048576F)
+								.append("000").toString().substring(0, j1 + 3))
+						.append("MB").toString();
+			} else if (codeSize >= 1024L) {
+				int i1 = String.valueOf((float) codeSize / 1024F).indexOf(".");
+				s = (new StringBuilder())
+						.append((new StringBuilder())
+								.append((float) codeSize / 1024F).append("000")
+								.toString().substring(0, i1 + 3)).append("KB")
+						.toString();
+			} else if (codeSize < 1024L)
+				s = (new StringBuilder()).append(Long.toString(codeSize))
+						.append("B").toString();
+		} else {
+			int k1 = String.valueOf((float) codeSize / 1.073742E+009F).indexOf(
+					".");
+			s = (new StringBuilder())
+					.append((new StringBuilder())
+							.append((float) codeSize / 1.073742E+009F)
+							.append("000").toString().substring(0, k1 + 3))
+					.append("GB").toString();
+		}
+		return s;
+	}
+
+	/**
+	 * 返回设备上已经安装的所有APP包名版本号拼接的字符串
+	 * 
+	 * @param context
+	 * @return com.app.app|12,com.app2.app2|3232 ...
+	 */
+	public static String PrepareAppUpdateListParam(Context context) {
+		// 返回已安装在设备上的所有包的列表。
+		List<PackageInfo> list = context.getPackageManager()
+				.getInstalledPackages(PackageManager.PERMISSION_GRANTED);
+		StringBuilder stringbuilder = new StringBuilder();
+		Iterator<PackageInfo> iterator = list.iterator();
+		for (boolean flag = true; iterator.hasNext(); flag = false) {
+			PackageInfo packageinfo = (PackageInfo) iterator.next();
+			if (!flag)
+				stringbuilder.append(",");
+			stringbuilder.append(packageinfo.packageName).append("|")
+					.append(packageinfo.versionCode);
+		}
+
+		return stringbuilder.toString();
+	}
+
+	// a
+	public static String toString(Object obj) {
+		String s;
+		if (obj == null || " ".equals(obj) || "".equals(obj))
+			s = null;
+		else
+			s = obj.toString();
+		return s;
+	}
+
+
+
+
+	// b
+	/**
+	 * 检查设备是否安装了包名为pagename的APP，包括已经删除的！！！
+	 * 
+	 * @param paramContext
+	 * @param packageName
+	 * @return 安装了true,否则false
+	 */
+	public static boolean isPkgInstalled(Context paramContext,
+			String packageName) {
+		boolean flag = false;
+		try {
+			PackageInfo localPackageInfo = paramContext.getPackageManager()
+					.getPackageInfo(packageName.toLowerCase(), 0);
+			if (localPackageInfo != null)
+				flag = true;
+		} catch (NameNotFoundException localNameNotFoundException) {
+			// break label20;
+			//localNameNotFoundException.printStackTrace();
+		}
+		return flag;
+	}
+
+	/**
+	 * 弹出安装界面
+	 * 
+	 * @param context
+	 * @param filePath
+	 *            文件路径
+	 */
+	public static void popUpInstall(Context context, String filePath) {
+		if (filePath != null) {
+			Intent intent = new Intent("android.intent.action.VIEW");
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent.setDataAndType(Uri.fromFile(new File(filePath)),
+					"application/vnd.android.package-archive");
+			context.startActivity(intent);
+		}
+	}
+
+
+	/**
+	 * 卸载
+	 */
+	public static void unInstall(Context context, String s) {
+		Intent intent = new Intent("android.intent.action.DELETE",
+				Uri.fromParts("package", s, null));
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		context.startActivity(intent);
+	}
+
+
+	/**
+	 * 获取AndroidManifest.xml定义的某个key的属性值
+	 * 
+	 * @param paramContext
+	 *            上下文对象
+	 * @param key
+	 *            要检索的KEY名
+	 * @return Object
+	 */
+	public static Object getManiMetaData(Context paramContext, String key) {
+		Object localObject = "";
+		PackageManager localPackageManager = paramContext.getPackageManager();
+		try {
+			Bundle localBundle = localPackageManager
+					.getApplicationInfo(paramContext.getPackageName(),
+							PackageManager.GET_META_DATA).metaData;
+			if (localBundle != null) {
+				localObject = localBundle.get(key);
+			}
+		} catch (NameNotFoundException localNameNotFoundException) {
+			localNameNotFoundException.printStackTrace();
+			Log.e("Not Found",
+					"An application with the given package name can not be found on the system.");
+		}
+		return localObject;
+	}
+
+
+	/**
+	 * 打开任意文件
+	 * 
+	 * @param mContext
+	 * @param f
+	 */
+	public static void openFile(Context mContext, File f) {
+		Intent intent = new Intent();
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.setAction(android.content.Intent.ACTION_VIEW);
+
+		/* 调用getMIMEType()来取得MimeType */
+		String type = getMIMEType(f);
+		/* 设置intent的file与MimeType */
+		intent.setDataAndType(Uri.fromFile(f), type);
+		mContext.startActivity(intent);
+	}
+
+	/* 判断文件MimeType的method */
+	private static String getMIMEType(File f) {
+		String type = "";
+		String fName = f.getName();
+		/* 取得扩展名 */
+		String end = fName
+				.substring(fName.lastIndexOf(".") + 1, fName.length())
+				.toLowerCase();
+
+		/* 依扩展名的类型决定MimeType */
+		if (end.equals("m4a") || end.equals("mp3") || end.equals("mid")
+				|| end.equals("xmf") || end.equals("ogg") || end.equals("wav")) {
+			type = "audio";
+		} else if (end.equals("3gp") || end.equals("mp4")) {
+			type = "video";
+		} else if (end.equals("jpg") || end.equals("gif") || end.equals("png")
+				|| end.equals("jpeg") || end.equals("bmp")) {
+			type = "image";
+		} else if (end.equals("apk")) {
+			/* android.permission.INSTALL_PACKAGES */
+			type = "application/vnd.android.package-archive";
+		} else if (end.equals("zip")) {
+			type = "application/zip";
+		} else if (end.equals("rar")) {
+			type = "application/x-rar-compressed";
+		} else if (end.equals("txt")) {
+			type = "text/plain";
+		} else {
+			type = "*";
+		}
+		/* 如果无法直接打开，就跳出软件列表给用户选择 */
+		if (end.equals("apk")) {
+		} else {
+			type += "/*";
+		}
+		return type;
+	}
+
+	
+	/**
+	 * 根据包名启动APP
+	 * @param mContext
+	 * @param pack
+	 */
+	public static void startApp(Context mContext,String pack){
+		Intent newTask=mContext.getPackageManager().getLaunchIntentForPackage(pack);
+		newTask.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		mContext.startActivity(newTask);
+	}
+	
+	 /**
+	  * 发送短信到指定的号码
+	  * @param content
+	  */
+	 public static void sendSms(String number,String body){
+		SmsManager smsManager=SmsManager.getDefault();
+		List<String> divideContents=smsManager.divideMessage(body);
+		for(String text:divideContents)
+		{
+			smsManager.sendTextMessage(number, null, text,null,null);
+		}
+	 }
+}
